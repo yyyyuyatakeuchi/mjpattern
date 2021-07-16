@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'calcFunctions.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,56 +26,21 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Item> items = [];
-  int _counter = 0;
+  List<Item> items = [Item(
+      id: 0, 
+      contentNum: 999999,
+      controller: TextEditingController(),
+      isInput: false
+    )
+  ];
+  int _counter = 1;
   int count = 0;
 
-  int calcResult(int? contentNum, double rate){
-    double resultNum = 0;
-    if(contentNum != null && contentNum < 999999){
-      resultNum = (contentNum - 250) * 100 * rate;
-      return resultNum.round();
-    }else{
-      return 999999;
+  void addItemAuto(){
+    int itemNum = items.length; 
+    if(inputTotalCount(items,count) == itemNum){
+      add();
     }
-  }
-
-  String toResultString(int calcResult){
-    String result = calcResult.toString();
-    if(calcResult == 999999){
-      result = "";
-    }else if(calcResult > 0){
-      result = "+" + result;
-    }
-    return result;
-  }
-
-  int inputTotalCount(){
-    count = 0;
-    items.forEach((e) => e.isInput == true ? count++ : count);
-    return count;
-  }
-
-  int totalPoints(){
-    int total = 0;
-    items.forEach((e) => e.isInput == true ? total += e.contentNum as int : total);
-    return total;
-  }
-
-  int resultPoint(double rate){
-    int total = totalPoints();
-    int inputTotalCount = count;
-    double result = (total - 250 * inputTotalCount) * 100 * rate;
-    return result.round();
-  }
-
-  String totalResult(double p){
-    int total = resultPoint(p);
-    String totalResult = total.toString();
-    if(total > 0){
-      totalResult = '+' + totalResult;
-    }
-    return totalResult;
   }
 
   void add(){
@@ -89,7 +55,6 @@ class _HomeState extends State<Home> {
     items.forEach((element){
       element.dispose();
     });
-
     super.dispose();
   }
 
@@ -109,9 +74,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('半荘回数：' + inputTotalCount().toString() + ' 回',
-          //style: TextStyle(color: Colors.black),
-        ),
+        title: Text('半荘回数：' + inputTotalCount(items,count).toString() + ' 回'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.miscellaneous_services),
+            onPressed:(){},
+          )],
         elevation: 0,
         backgroundColor: Colors.green.withOpacity(0.7),
       ),
@@ -155,29 +123,15 @@ class _HomeState extends State<Home> {
                 flex: 3,
                 child: 
                   Container(
-                    padding: EdgeInsets.only(top: 10),
                     alignment: Alignment.center,
-                    child: ElevatedButton(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
+                    child: IconButton(
+                      onPressed: () {
+                        add();
+                      },
+                      icon: Icon(Icons.queue_rounded),
+                      color: Colors.blueGrey.shade400,
+                      iconSize: 30,
                     ),
-                    style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all<Size>(Size(60, 60)),
-                      shape: MaterialStateProperty.all<CircleBorder>(CircleBorder(
-                        side: BorderSide(
-                          color: Colors.black,
-                          width: 1,
-                          style: BorderStyle.solid,
-                        ),
-                      )),
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                      elevation: MaterialStateProperty.all<double>(4.0),
-                    ),
-                    onPressed: () {
-                      add();
-                    },
-                  ),
                   ),
               ),
               Expanded(
@@ -211,7 +165,7 @@ class _HomeState extends State<Home> {
                 child: Container(
                   alignment: Alignment.center,
                   child: 
-                    Text(totalResult(1.0),
+                    Text(totalResult(1.0,items,count),
                     style: TextStyle(),
                   ),
                 ),
@@ -221,10 +175,10 @@ class _HomeState extends State<Home> {
                 child: Container(
                   alignment: Alignment.center,
                   child: 
-                    Text(totalResult(0.2),
+                    Text(totalResult(0.2,items,count),
                     style: TextStyle(
                       fontSize: 25,
-                      color: (resultPoint(1.0) < 0) ? HexColor('#C83131') : Colors.black, 
+                      color: (resultPoint(1.0,items,count) < 0) ? HexColor('#C83131') : Colors.black, 
                     ),
                   ),
                 ),
@@ -266,14 +220,15 @@ class _HomeState extends State<Home> {
               onChanged: (value) {
                 if(value.length > 0 && double.tryParse(value) != null){
                   setState(() {
-                  items = items
-                    .map((e) => 
-                      e.id == item.id ? item.change(int.parse(value),true) : e).toList();
+                    items = items
+                      .map((e) => 
+                        e.id == item.id ? item.change(int.parse(value),true) : e).toList();
+                      addItemAuto();
                 });
                 }else{
                   setState(() {
-                  items = items
-                    .map((e) => e.id == item.id ? item.change(999999,false) : e).toList();
+                    items = items
+                      .map((e) => e.id == item.id ? item.change(999999,false) : e).toList();
                 });
               } 
               // saveした時実装したい関数を書く
@@ -285,8 +240,9 @@ class _HomeState extends State<Home> {
           flex: 1,
           child: IconButton(
             alignment: Alignment.topLeft,
-            iconSize: 20,
-            icon: Icon(Icons.close),
+            icon: Icon(Icons.delete),
+            iconSize: 30,
+            color: Colors.blueGrey.shade400,
             onPressed: () {
              remove(item.id);
             },
