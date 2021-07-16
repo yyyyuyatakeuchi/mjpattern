@@ -165,7 +165,7 @@ class _HomeState extends State<Home> {
                 child: Container(
                   alignment: Alignment.center,
                   child: 
-                    Text(totalResult(1.0,items,count),
+                    Text(totalResult(1.0,items,inputTotalCount(items,count)),
                     style: TextStyle(),
                   ),
                 ),
@@ -175,9 +175,9 @@ class _HomeState extends State<Home> {
                 child: Container(
                   alignment: Alignment.center,
                   child: 
-                    Text(totalResult(0.2,items,count),
+                    Text(totalResult(0.2,items,inputTotalCount(items,count)),
                     style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 22,
                       color: (resultPoint(1.0,items,count) < 0) ? HexColor('#C83131') : Colors.black, 
                     ),
                   ),
