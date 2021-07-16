@@ -178,7 +178,7 @@ class _HomeState extends State<Home> {
                     Text(totalResult(0.2,items,inputTotalCount(items,count)),
                     style: TextStyle(
                       fontSize: 21,
-                      color: (resultPoint(1.0,items,count) < 0) ? HexColor('#C83131') : Colors.black, 
+                      color: (resultPoint(1.0,items,inputTotalCount(items,count)) < 0) ? HexColor('#C83131') : Colors.black, 
                     ),
                   ),
                 ),
